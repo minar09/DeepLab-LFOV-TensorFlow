@@ -15,6 +15,9 @@ downloads/
 eggs/
 .eggs/
 lib/
+.idea/
+checkpoints/
+image/
 lib64/
 parts/
 sdist/
