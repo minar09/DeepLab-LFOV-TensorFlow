@@ -17,8 +17,9 @@ import tensorflow as tf
 import numpy as np
 
 from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
+from deeplab_lfov.utils import load
 
-SAVE_DIR = './output/'
+SAVE_DIR = './images_val/'
 IMG_MEAN = np.array((104.00698793, 116.66876762,
                      122.67891434), dtype=np.float32)
 WEIGHTS_PATH = './checkpoints/deeplab_lfov_10k/'
@@ -34,25 +35,13 @@ def get_arguments():
     """
     parser = argparse.ArgumentParser(
         description="DeepLabLFOV Network Inference.")
-    parser.add_argument("img_path", type=str,
-                        help="Path to the RGB image file.")
-    parser.add_argument("model_weights", type=str,
-                        help="Path to the file with model weights.", default=RESTORE_FROM)
+    parser.add_argument("--img_path", type=str,
+                        help="Path to the RGB image file.", default=SAVE_DIR)
+    parser.add_argument("--model_weights", type=str,
+                        help="Path to the file with model weights.", default=WEIGHTS_PATH)
     parser.add_argument("--save_dir", type=str, default=SAVE_DIR,
                         help="Where to save predicted mask.")
     return parser.parse_args()
-
-
-def load(saver, sess, ckpt_path):
-    '''Load trained weights.
-
-    Args:
-      saver: TensorFlow saver object.
-      sess: TensorFlow session.
-      ckpt_path: path to checkpoint file with parameters.
-    '''
-    saver.restore(sess, ckpt_path)
-    print("Restored model parameters from {}".format(ckpt_path))
 
 
 def main():

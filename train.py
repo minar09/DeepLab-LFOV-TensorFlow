@@ -1,9 +1,9 @@
 from __future__ import print_function
 
-from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
+from deeplab_lfov import DeepLabLFOVModel, ImageReader
+from deeplab_lfov.utils import load, save
 import numpy as np
 import tensorflow as tf
-import matplotlib.pyplot as plt
 import random
 """Training script for the DeepLab-LargeFOV network on the PASCAL VOC dataset
    for semantic image segmentation.
@@ -13,11 +13,8 @@ which contains approximately 10000 images for training and 1500 images for valid
 """
 
 import argparse
-from datetime import datetime
 import os
-import sys
 import time
-from six.moves import xrange
 import matplotlib
 matplotlib.use('Agg')
 
@@ -75,32 +72,6 @@ def get_arguments():
                         help="Path to the file with caffemodel weights. "
                              "If not set, all the variables are initialised randomly.")
     return parser.parse_args()
-
-
-def save(saver, sess, logdir, step):
-    model_name = 'model.ckpt'
-    checkpoint_path = os.path.join(logdir, model_name)
-
-    if not os.path.exists(logdir):
-        os.makedirs(logdir)
-
-    saver.save(sess, checkpoint_path, global_step=step)
-    print('The checkpoint has been created.')
-
-
-def load(loader, sess, ckpt_path):
-    '''Load trained weights.
-
-    Args:
-      loader: TensorFlow saver object.
-      sess: TensorFlow session.
-      ckpt_path: path to checkpoint file with parameters.
-    '''
-    try:
-        loader.restore(sess, ckpt_path)
-        print("Restored model parameters from {}".format(ckpt_path))
-    except Exception as err:
-        print("Restore failed. Error: %s", err)
 
 
 def main():

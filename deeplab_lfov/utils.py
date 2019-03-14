@@ -1,3 +1,6 @@
+import os
+
+import tensorflow as tf
 from PIL import Image
 import numpy as np
 
@@ -39,3 +42,28 @@ def decode_labels(mask):
             if k < 21:
                 pixels[k_, j_] = label_colours[k]
     return np.array(img)
+
+
+def load(saver, sess, ckpt_path):
+    '''Load trained weights.
+
+    Args:
+      saver: TensorFlow saver object.
+      sess: TensorFlow session.
+      ckpt_path: path to checkpoint file with parameters.
+    '''
+    ckpt = tf.train.get_checkpoint_state(ckpt_path)
+    if ckpt and ckpt.model_checkpoint_path:
+        saver.restore(sess, ckpt.model_checkpoint_path)
+        print("Restored model parameters from {}".format(ckpt_path))
+
+
+def save(saver, sess, logdir, step):
+    model_name = 'model.ckpt'
+    checkpoint_path = os.path.join(logdir, model_name)
+
+    if not os.path.exists(logdir):
+        os.makedirs(logdir)
+
+    saver.save(sess, checkpoint_path, global_step=step)
+    print('The checkpoint has been created.')

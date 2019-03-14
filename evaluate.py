@@ -7,17 +7,16 @@ This script evaluates the model on around 1500 validation images.
 from __future__ import print_function
 
 import argparse
-from datetime import datetime
 import os
-import sys
-import time
 
 from PIL import Image
 
 import tensorflow as tf
 import numpy as np
+import cv2
 
 from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
+from deeplab_lfov.utils import load
 
 DATA_DIRECTORY = 'D:/Datasets/Dressup10k/images/validation/'
 DATA_LIST_PATH = 'D:/Datasets/Dressup10k/list/val.txt/'
@@ -55,18 +54,6 @@ def get_arguments():
     return parser.parse_args()
 
 
-def load(saver, sess, ckpt_path):
-    '''Load trained weights.
-
-    Args:
-      saver: TensorFlow saver object.
-      sess: TensorFlow session.
-      ckpt_path: path to checkpoint file with parameters.
-    '''
-    saver.restore(sess, ckpt_path)
-    print("Restored model parameters from {}".format(ckpt_path))
-
-
 def main():
     """Create the model and start the evaluation process."""
     args = get_arguments()
@@ -87,7 +74,8 @@ def main():
     image_batch, label_batch = tf.expand_dims(
         image, dim=0), tf.expand_dims(label, dim=0)
     # Create network.
-    net = DeepLabLFOVModel(args.weights_path)
+    # net = DeepLabLFOVModel(args.weights_path)
+    net = DeepLabLFOVModel()
 
     # Which variables to load.
     trainable = tf.trainable_variables()
@@ -110,8 +98,9 @@ def main():
 
     # Load weights.
     saver = tf.train.Saver(var_list=trainable)
-    if args.restore_from is not None:
-        load(saver, sess, args.restore_from)
+    if args.weights_path is not None:
+        # load(saver, sess, args.restore_from)
+        load(saver, sess, args.weights_path)
 
     # Start queue threads.
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
@@ -128,7 +117,9 @@ def main():
         if args.save_dir is not None:
             img = decode_labels(preds[0, :, :, 0])
             im = Image.fromarray(img)
-            im.save(args.save_dir + str(step) + '.png')
+            im.save(args.save_dir + str(step) + '_vis.png')
+            cv2.imwrite(args.save_dir + str(step) + '.png', preds[0, :, :, 0])
+
         if step % 100 == 0:
             print('step {:d} \t'.format(step))
     print('Mean IoU: {:.3f}'.format(mIoU.eval(session=sess)))
