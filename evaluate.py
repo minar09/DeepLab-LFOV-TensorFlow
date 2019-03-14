@@ -19,12 +19,14 @@ import numpy as np
 
 from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
 
-DATA_DIRECTORY = '/home//VOCdevkit'
-DATA_LIST_PATH = './dataset/val.txt'
-NUM_STEPS = 1449
-RESTORE_FROM = None
+DATA_DIRECTORY = 'D:/Datasets/Dressup10k/images/validation/'
+DATA_LIST_PATH = 'D:/Datasets/Dressup10k/list/val.txt/'
+NUM_STEPS = 1000
+WEIGHTS_PATH = './checkpoints/deeplab_lfov_10k/'
+RESTORE_FROM = WEIGHTS_PATH + 'model.ckpt'
 SAVE_DIR = './images_val/'
-WEIGHTS_PATH = None
+N_CLASSES = 18
+
 
 IMG_MEAN = np.array((104.00698793, 116.66876762,
                      122.67891434), dtype=np.float32)
@@ -95,7 +97,7 @@ def main():
 
     # mIoU
     mIoU, update_op = tf.contrib.metrics.streaming_mean_iou(
-        pred, label_batch, num_classes=21)
+        pred, label_batch, num_classes=N_CLASSES)
 
     # Set up tf session and initialize variables.
     config = tf.ConfigProto()
@@ -119,8 +121,8 @@ def main():
 
     # Iterate over images.
     for step in range(args.num_steps):
-        #mIoU_value = sess.run([mIoU])
-        #_ = update_op.eval(session=sess)
+        # mIoU_value = sess.run([mIoU])
+        # _= update_op.eval(session=sess)
         preds, _ = sess.run([pred, update_op])
 
         if args.save_dir is not None:

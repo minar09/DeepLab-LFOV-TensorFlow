@@ -21,6 +21,9 @@ from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
 SAVE_DIR = './output/'
 IMG_MEAN = np.array((104.00698793, 116.66876762,
                      122.67891434), dtype=np.float32)
+WEIGHTS_PATH = './checkpoints/deeplab_lfov_10k/'
+RESTORE_FROM = WEIGHTS_PATH + 'model.ckpt'
+N_CLASSES = 18
 
 
 def get_arguments():
@@ -34,7 +37,7 @@ def get_arguments():
     parser.add_argument("img_path", type=str,
                         help="Path to the RGB image file.")
     parser.add_argument("model_weights", type=str,
-                        help="Path to the file with model weights.")
+                        help="Path to the file with model weights.", default=RESTORE_FROM)
     parser.add_argument("--save_dir", type=str, default=SAVE_DIR,
                         help="Where to save predicted mask.")
     return parser.parse_args()
@@ -59,8 +62,8 @@ def main():
     # Prepare image.
     img = tf.image.decode_jpeg(tf.read_file(args.img_path), channels=3)
     # Convert RGB to BGR.
-    img_r, img_g, img_b = tf.split(split_dim=2, num_split=3, value=img)
-    img = tf.cast(tf.concat(2, [img_b, img_g, img_r]), dtype=tf.float32)
+    img_r, img_g, img_b = tf.split(value=img, num_or_size_splits=3, axis=2)
+    img = tf.cast(tf.concat(axis=2, values=[img_b, img_g, img_r]), dtype=tf.float32)
     # Extract mean.
     img -= IMG_MEAN
 
