@@ -26,7 +26,7 @@ INPUT_SIZE = '321, 321'
 LEARNING_RATE = 1e-4
 MEAN_IMG = tf.Variable(np.array(
     (104.00698793, 116.66876762, 122.67891434)), trainable=False, dtype=tf.float32)
-NUM_STEPS = 16000
+NUM_STEPS = 20000
 RANDOM_SCALE = True
 SNAPSHOT_DIR = './checkpoints/deeplab_lfov_10k/'
 RESTORE_FROM = SNAPSHOT_DIR + 'model.ckpt'
@@ -118,8 +118,8 @@ def main():
 
     # Saver for storing checkpoints of the model.
     saver = tf.train.Saver(var_list=trainable, max_to_keep=5)
-    if args.restore_from is not None:
-        load(saver, sess, args.restore_from)
+    if args.snapshot_dir is not None:
+        load(saver, sess, args.snapshot_dir)
 
     # Start queue threads.
     threads = tf.train.start_queue_runners(coord=coord, sess=sess)
