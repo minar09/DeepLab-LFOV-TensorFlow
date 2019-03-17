@@ -19,7 +19,7 @@ import numpy as np
 from deeplab_lfov import DeepLabLFOVModel, ImageReader, decode_labels
 from deeplab_lfov.utils import load
 
-SAVE_DIR = './images_val/'
+SAVE_DIR = './output/'
 IMG_MEAN = np.array((104.00698793, 116.66876762,
                      122.67891434), dtype=np.float32)
 WEIGHTS_PATH = './checkpoints/deeplab_lfov_10k/'
@@ -79,6 +79,9 @@ def main():
 
     # Perform inference.
     preds = sess.run([pred])
+
+    if not os.path.exists(args.save_dir):
+        os.makedirs(args.save_dir)
 
     msk = decode_labels(np.array(preds)[0, 0, :, :, 0])
     im = Image.fromarray(msk)
